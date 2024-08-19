@@ -2,7 +2,7 @@ import mysql.connector
 from local_settings import dbconfig
 from query_templates import *
 
-
+"""
 class MixinMySQLQuery:
     def simple_select(self, query, value):
         if self.is_exist_table(get_tables_name_query, value):
@@ -26,7 +26,7 @@ class MixinMySQLQuery:
             return True
 
         except Exception as e:
-            print(f"{e.__class__.__name__}: {e}")
+            print(f"{e.__class__.__name__}: {e}")"""
 
 
 class MySQLConnection(MixinMySQLQuery):
