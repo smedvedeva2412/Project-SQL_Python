@@ -24,8 +24,31 @@ ORDER BY
     f.release_year, c.name;
 """
 
+
+# Получение списка категорий
 get_categories_query = """
 SELECT name FROM category;
+"""
+
+# Получение доступных годов для выбранной категории
+get_years_for_category_query = """
+SELECT DISTINCT f.release_year
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+WHERE c.name = %s
+ORDER BY f.release_year;
+    """
+
+
+# Получение фильмов по выбранной категории и году
+search_by_genre_year_query = """
+SELECT f.title, c.name, f.release_year
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+WHERE c.name = %s AND f.release_year = %s
+ORDER BY f.title;
 """
 
 # Создание таблицы для хранения поисковых запросов
