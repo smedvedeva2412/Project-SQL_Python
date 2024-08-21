@@ -6,34 +6,47 @@ WHERE title LIKE %s OR description LIKE %s
 LIMIT 10;
 """
 
-# SQL-запрос для поиска фильмов по жанру и году
+# Поиск фильмов по жанру и году
 search_by_genre_year_query = """
 SELECT 
     f.title, 
-    f.description, 
+    c.name AS genre, 
     f.release_year
 FROM 
     film f
-JOIN 
+LEFT JOIN 
     film_category fc ON f.film_id = fc.film_id
-JOIN 
+LEFT JOIN 
     category c ON fc.category_id = c.category_id
-WHERE 
+WHERE
     c.name = %s AND f.release_year = %s
-LIMIT 10;
+ORDER BY 
+    f.release_year, c.name;
 """
 
 # Создание таблицы для хранения поисковых запросов
-create_search_keywords_table_query = """
+create_search_keywords_table = """
 CREATE TABLE IF NOT EXISTS search_keywords_sv (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    keyword VARCHAR(255) NOT NULL,
+    keyword VARCHAR(255) UNIQUE NOT NULL,
     search_count INT DEFAULT 1,
     last_search DATETIME DEFAULT NOW()
 );
 """
 
-# Сохранение поискового запроса или обновление счетчика и времени поиска
+# Проверка существования таблицы
+get_tables_name_query = "SHOW TABLES LIKE %s;"
+
+# Запрос для получения популярных запросов
+get_popular_queries = """
+SELECT keyword, COUNT(*) AS search_count
+FROM search_keywords_sv
+GROUP BY keyword
+ORDER BY search_count DESC
+LIMIT 10;
+"""
+
+# Сохранение поискового запроса
 save_search_query = """
 INSERT INTO search_keywords_sv (keyword, search_count)
 VALUES (%s, 1)
