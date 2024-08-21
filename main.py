@@ -1,6 +1,12 @@
 from mysql_manager import MySQLConnection
-from query_templates import search_by_keyword_query, search_by_genre_year_query, get_popular_queries
+from query_templates import (search_by_keyword_query, search_by_genre_year_query, get_popular_queries,
+                             get_categories_query)
 from local_settings import dbconfig
+
+
+def get_categories(db):
+    categories = db.simple_select(get_categories_query)
+    return [category[0] for category in categories]
 
 
 def search_movies_by_keyword(db, keyword):
@@ -43,7 +49,22 @@ def main():
                     print("Фильмы не найдены.")
 
             elif choice == '2':
-                genre = input("Введите жанр: ")
+                # Получение списка категорий
+                categories = get_categories(db)
+                print("\nСписок категорий:")
+                for idx, category in enumerate(categories, start=1):
+                    print(f"{idx}. {category}")
+
+                category_choice = input("\nВыберите категорию (введите номер): ")
+                try:
+                    category_idx = int(category_choice) - 1  # Индексация начинается с 0
+                    if category_idx < 0 or category_idx >= len(categories):
+                        raise ValueError("Неверный выбор категории.")
+                    genre = categories[category_idx]
+                except ValueError:
+                    print("Неверный выбор категории. Попробуйте снова.")
+                    continue
+
                 year = input("Введите год: ")
                 try:
                     year = int(year)  # Год должен быть числом

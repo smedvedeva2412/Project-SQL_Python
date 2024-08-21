@@ -24,6 +24,10 @@ ORDER BY
     f.release_year, c.name;
 """
 
+get_categories_query = """
+SELECT name FROM category;
+"""
+
 # Создание таблицы для хранения поисковых запросов
 create_search_keywords_table = """
 CREATE TABLE IF NOT EXISTS search_keywords_sv (
