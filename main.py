@@ -87,58 +87,15 @@ def main():
                     for idx, search in enumerate(popular_searches, start=1):
                         print(f"{idx}. {search[0]} - {search[1]} раз(а)")
                 else:
-                    print("Нет популярных запросов.")
+                    print("Нет запросов.")
 
             elif choice == '4':
                 print("Выход из программы.")
                 break
 
             else:
-                print("Неверный выбор. Попробуйте снова.")
+                print("Фильмов с этим ключевым словом нет. Попробуйте снова.")
 
-
-
-
-"""
-               category_choice = input("\nВыберите категорию (введите номер): ")
-               
-                try:
-                    category_idx = int(category_choice) - 1  # Индексация начинается с 0
-                    if category_idx < 0 or category_idx >= len(categories):
-                        raise ValueError("Неверный выбор категории.")
-                    genre = categories[category_idx]
-                except ValueError:
-                    print("Неверный выбор категории. Попробуйте снова.")
-                    continue
-
-                year = input("Введите год: ")
-                try:
-                    year = int(year)  # Год должен быть числом
-                    result = search_movies_by_genre_year(db, genre, year)
-                    if result:
-                        for row in result:
-                            print(row)
-                    else:
-                        print("Фильмы не найдены.")
-                except ValueError:
-                    print("Год должен быть числом!")
-
-            elif choice == '3':
-                popular_searches = display_popular_searches(db)
-                if popular_searches:
-                    print("Популярные запросы:")
-                    for idx, search in enumerate(popular_searches, start=1):
-                        print(f"{idx}. {search[0]} - {search[1]} раз(а)")
-                else:
-                    print("Нет популярных запросов.")
-
-            elif choice == '4':
-                print("Выход из программы.")
-                break
-
-            else:
-                print("Неверный выбор. Попробуйте снова.")
-"""
 
 if __name__ == "__main__":
     main()

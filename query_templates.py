@@ -56,8 +56,7 @@ create_search_keywords_table = """
 CREATE TABLE IF NOT EXISTS search_keywords_sv (
     id INT AUTO_INCREMENT PRIMARY KEY,
     keyword VARCHAR(255) UNIQUE NOT NULL,
-    search_count INT DEFAULT 1,
-    last_search DATETIME DEFAULT NOW()
+    search_count INT DEFAULT 1
 );
 """
 
@@ -66,9 +65,8 @@ get_tables_name_query = "SHOW TABLES LIKE %s;"
 
 # Запрос для получения популярных запросов
 get_popular_queries = """
-SELECT keyword, COUNT(*) AS search_count
+SELECT keyword, search_count
 FROM search_keywords_sv
-GROUP BY keyword
 ORDER BY search_count DESC
 LIMIT 10;
 """
@@ -77,5 +75,5 @@ LIMIT 10;
 save_search_query = """
 INSERT INTO search_keywords_sv (keyword, search_count)
 VALUES (%s, 1)
-ON DUPLICATE KEY UPDATE search_count = search_count + 1, last_search = NOW();
+ON DUPLICATE KEY UPDATE search_count = search_count + 1;
 """

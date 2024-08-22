@@ -75,7 +75,7 @@ if __name__ == '__main__':
         print(f"Полученные данные: {rows[0]}")
 
         assert (film_id, title, release_year) == (
-        1, 'ACADEMY DINOSAUR', 2013), "Error: The first film data does not match!"
+            1, 'ACADEMY DINOSAUR', 2013), "Error: The first film data does not match!"
         assert (film_id, title, release_year) != (2, 'ACADEMY DINOSAUR', 2013), "Error: Test data mismatch!"
 
         # Проверка метода .simple_select()
