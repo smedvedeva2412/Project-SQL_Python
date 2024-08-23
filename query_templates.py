@@ -8,20 +8,12 @@ LIMIT 10;
 
 # Поиск фильмов по жанру и году
 search_by_genre_year_query = """
-SELECT 
-    f.title, 
-    c.name AS genre, 
-    f.release_year
-FROM 
-    film f
-LEFT JOIN 
-    film_category fc ON f.film_id = fc.film_id
-LEFT JOIN 
-    category c ON fc.category_id = c.category_id
-WHERE
-    c.name = %s AND f.release_year = %s
-ORDER BY 
-    f.release_year, c.name;
+SELECT f.title, c.name AS genre, f.release_year
+FROM film f
+LEFT JOIN film_category fc ON f.film_id = fc.film_id
+LEFT JOIN category c ON fc.category_id = c.category_id
+WHERE c.name = %s AND f.release_year = %s
+ORDER BY f.release_year, c.name;
 """
 
 
@@ -38,7 +30,7 @@ JOIN film_category fc ON f.film_id = fc.film_id
 JOIN category c ON fc.category_id = c.category_id
 WHERE c.name = %s
 ORDER BY f.release_year;
-    """
+"""
 
 
 # Получение фильмов по выбранной категории и году
@@ -56,8 +48,7 @@ create_search_keywords_table = """
 CREATE TABLE IF NOT EXISTS search_keywords_sv (
     id INT AUTO_INCREMENT PRIMARY KEY,
     keyword VARCHAR(255) UNIQUE NOT NULL,
-    search_count INT DEFAULT 1
-);
+    search_count INT DEFAULT 1);
 """
 
 # Проверка существования таблицы

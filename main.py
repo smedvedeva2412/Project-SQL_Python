@@ -54,7 +54,7 @@ def main():
                     print("Фильмы не найдены.")
 
             elif choice == '2':
-                # Получение списка категорий
+                # 1. Получение списка категорий
                 categories = get_categories(db)
                 print("\nСписок категорий:")
                 for idx, category in enumerate(categories, start=1):
@@ -63,7 +63,7 @@ def main():
                 category_choice = int(input("Выберите категорию (номер): ")) - 1
                 selected_category = categories[category_choice]
 
-                # Шаг 2: Получение доступных годов для выбранной категории
+                # 2. Получение доступных годов для выбранной категории
                 years = get_years_for_category(db, selected_category)
                 print(f"Доступные годы для категории '{selected_category}':")
                 for idx, year in enumerate(years, start=1):
@@ -72,7 +72,7 @@ def main():
                 year_choice = int(input("Выберите год (номер): ")) - 1
                 selected_year = years[year_choice]
 
-                # Шаг 3: Поиск фильмов по выбранной категории и году
+                # 3. Поиск фильмов по выбранной категории и году
                 result = search_movies_by_genre_year(db, selected_category, selected_year)
                 if result:
                     for row in result:
