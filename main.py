@@ -114,21 +114,19 @@ def main():
 
             elif choice == '3':
                 # Показ популярных запросов
-                print("\nПопулярные ключевые слова:")
                 popular_keywords: None = display_popular_keywords(db)
                 if popular_keywords:
                     for idx, keyword in enumerate(popular_keywords, start=1):
                         print(f"{idx}. {keyword[0]} - {keyword[1]} раз(а)")
-                else:
-                    print("Нет популярных ключевых слов.")
 
-                print("\nПопулярные жанры:")
+                        print("Нет популярных ключевых слов.")
+
                 popular_genres = display_popular_genres(db)
                 if popular_genres:
                     for idx, genre in enumerate(popular_genres, start=1):
                         print(f"{idx}. {genre[0]} - {genre[1]} раз(а)")
-                else:
-                    print("Нет популярных жанров.")
+
+                        print("Нет популярных жанров.")
 
             elif choice == '4':
                 print("Выход из программы.")

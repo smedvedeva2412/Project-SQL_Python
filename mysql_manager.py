@@ -59,8 +59,8 @@ class MySQLConnection(MixinMySQLQuery):
                 print("Таблица 'search_keywords_sv' успешно создана.")
             except Exception as e:
                 print(f"Ошибка при создании таблицы: {e}")
-        else:
-            print("Таблица 'search_keywords_sv' уже существует.")
+        #else:
+        #    print("Таблица 'search_keywords_sv' уже существует.")
 
 
 if __name__ == '__main__':
