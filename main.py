@@ -1,6 +1,9 @@
 from mysql_manager import MySQLConnection
-from query_templates import (search_by_keyword_query, search_by_genre_year_query, get_popular_queries,
-                             get_years_for_category_query, get_categories_query)
+from query_templates import (
+    search_by_keyword_query, search_by_genre_year_query, get_popular_keywords_query,
+    get_popular_genres_query, get_years_for_category_query, get_categories_query,
+    save_search_keyword_query, save_search_genre_year_query
+)
 from local_settings import dbconfig
 
 
@@ -16,20 +19,35 @@ def get_years_for_category(db, category_name):
 
 def search_movies_by_genre_year(db, genre, year):
     result = db.simple_select(search_by_genre_year_query, (genre, year))
-    db.save_search_query(f"Genre: {genre}, Year: {year}")
+    db.save_search_query(save_search_genre_year_query, genre, year)
     return result
 
 
 def search_movies_by_keyword(db, keyword):
     search_keyword = f'%{keyword}%'
     result = db.simple_select(search_by_keyword_query, (search_keyword, search_keyword))
-    db.save_search_query(keyword)
+    db.save_search_query(save_search_keyword_query, keyword)
     return result
 
 
-def display_popular_searches(db):
-    result = db.simple_select(get_popular_queries)
-    return result
+def display_popular_keywords(db):
+    result = db.simple_select(get_popular_keywords_query)
+    if result:
+        print("Популярные ключевые слова:")
+        for idx, search in enumerate(result, start=1):
+            print(f"{idx}. {search[0]} - {search[1]} раз(а)")
+    else:
+        print("Нет запросов по ключевым словам.")
+
+
+def display_popular_genres(db):
+    result = db.simple_select(get_popular_genres_query)
+    if result:
+        print("Популярные запросы по жанрам и годам:")
+        for idx, search in enumerate(result, start=1):
+            print(f"{idx}. {search[0]} - {search[1]} раз(а)")
+    else:
+        print("Нет запросов по жанрам и годам.")
 
 
 def main():
@@ -60,8 +78,15 @@ def main():
                 for idx, category in enumerate(categories, start=1):
                     print(f"{idx}. {category}")
 
-                category_choice = int(input("Выберите категорию (номер): ")) - 1
-                selected_category = categories[category_choice]
+                while True:
+                    try:
+                        category_choice = int(input("Выберите категорию (номер): ")) - 1
+                        if category_choice < 0 or category_choice >= len(categories):
+                            raise ValueError("Неверный номер категории.")
+                        selected_category = categories[category_choice]
+                        break
+                    except ValueError as e:
+                        print(f"Ошибка: {e}. Пожалуйста, введите корректный номер категории.")
 
                 # 2. Получение доступных годов для выбранной категории
                 years = get_years_for_category(db, selected_category)
@@ -69,8 +94,15 @@ def main():
                 for idx, year in enumerate(years, start=1):
                     print(f"{idx}. {year}")
 
-                year_choice = int(input("Выберите год (номер): ")) - 1
-                selected_year = years[year_choice]
+                while True:
+                    try:
+                        year_choice = int(input("Выберите год (номер): ")) - 1
+                        if year_choice < 0 or year_choice >= len(years):
+                            raise ValueError("Неверный номер года.")
+                        selected_year = years[year_choice]
+                        break
+                    except ValueError as e:
+                        print(f"Ошибка: {e}. Пожалуйста, введите корректный номер года.")
 
                 # 3. Поиск фильмов по выбранной категории и году
                 result = search_movies_by_genre_year(db, selected_category, selected_year)
@@ -81,20 +113,29 @@ def main():
                     print("Фильмы не найдены.")
 
             elif choice == '3':
-                popular_searches = display_popular_searches(db)
-                if popular_searches:
-                    print("Популярные запросы:")
-                    for idx, search in enumerate(popular_searches, start=1):
-                        print(f"{idx}. {search[0]} - {search[1]} раз(а)")
+                # Показ популярных запросов
+                print("\nПопулярные ключевые слова:")
+                popular_keywords: None = display_popular_keywords(db)
+                if popular_keywords:
+                    for idx, keyword in enumerate(popular_keywords, start=1):
+                        print(f"{idx}. {keyword[0]} - {keyword[1]} раз(а)")
                 else:
-                    print("Нет запросов.")
+                    print("Нет популярных ключевых слов.")
+
+                print("\nПопулярные жанры:")
+                popular_genres = display_popular_genres(db)
+                if popular_genres:
+                    for idx, genre in enumerate(popular_genres, start=1):
+                        print(f"{idx}. {genre[0]} - {genre[1]} раз(а)")
+                else:
+                    print("Нет популярных жанров.")
 
             elif choice == '4':
                 print("Выход из программы.")
                 break
 
             else:
-                print("Фильмов с этим ключевым словом нет. Попробуйте снова.")
+                print("Выберете цифру, соответствующую вашему запросу, и попробуйте снова.")
 
 
 if __name__ == "__main__":

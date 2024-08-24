@@ -17,11 +17,11 @@ class MixinMySQLQuery:
         except Exception as e:
             print(f"{e.__class__.__name__}: {e}")
 
-    def save_search_query(self, keyword):
+    def save_search_query(self, query, *params):
         try:
-            self.cursor.execute(save_search_query, (keyword,))
+            self.cursor.execute(query, params)
             self.connection.commit()
-            #print(f"Saved keyword: {keyword}")
+            #print(f"Saved query with params: {params}")
         except Exception as e:
             print(f"{e.__class__.__name__}: {e}")
 
@@ -65,13 +65,13 @@ class MySQLConnection(MixinMySQLQuery):
 
 if __name__ == '__main__':
     with MySQLConnection(dbconfig) as db:
-        # Проверка подключения
+        # Проверка создания подключения
         db.cursor.execute('SELECT film_id, title, release_year FROM film LIMIT 1;')
         rows = db.cursor.fetchall()
         film_id, title, release_year = rows[0]
         release_year = int(release_year)
 
-        # Выведем фактические данные для проверки
+        # Вывод фактических данных для проверки
         print(f"Полученные данные: {rows[0]}")
 
         assert (film_id, title, release_year) == (
