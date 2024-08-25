@@ -1,7 +1,7 @@
 from mysql_manager import MySQLConnection
 from query_templates import (
     search_by_keyword_query, search_by_genre_year_query, get_popular_keywords_query,
-    get_popular_genres_query, get_years_for_category_query, get_categories_query,
+    get_popular_genres_query, get_categories_query,
     save_search_keyword_query, save_search_genre_year_query
 )
 from local_settings import dbconfig
@@ -87,22 +87,14 @@ def main():
                         break
                     except ValueError as e:
                         print(f"Ошибка: {e}. Пожалуйста, введите корректный номер категории.")
-
-                # 2. Получение доступных годов для выбранной категории
-                years = get_years_for_category(db, selected_category)
-                print(f"Доступные годы для категории '{selected_category}':")
-                for idx, year in enumerate(years, start=1):
-                    print(f"{idx}. {year}")
-
+                # 2. Выбор года
                 while True:
-                    try:
-                        year_choice = int(input("Выберите год (номер): ")) - 1
-                        if year_choice < 0 or year_choice >= len(years):
-                            raise ValueError("Неверный номер года.")
-                        selected_year = years[year_choice]
+                    year_input = input("Введите любой год с 1980 до 2023: ")
+                    if year_input.isdigit():
+                        selected_year = int(year_input)
                         break
-                    except ValueError as e:
-                        print(f"Ошибка: {e}. Пожалуйста, введите корректный номер года.")
+                    else:
+                        print("Ошибка: пожалуйста, введите корректный год в виде числа.")
 
                 # 3. Поиск фильмов по выбранной категории и году
                 result = search_movies_by_genre_year(db, selected_category, selected_year)

@@ -21,15 +21,6 @@ get_categories_query = """
 SELECT name FROM category;
 """
 
-# Получение доступных годов для выбранной категории
-get_years_for_category_query = """
-SELECT DISTINCT f.release_year
-FROM film f
-JOIN film_category fc ON f.film_id = fc.film_id
-JOIN category c ON fc.category_id = c.category_id
-WHERE c.name = %s
-ORDER BY f.release_year;
-"""
 
 # Создание таблицы для хранения поисковых запросов по ключевым словам
 create_search_keywords_table = """
