@@ -6,21 +6,31 @@ WHERE title LIKE %s OR description LIKE %s
 LIMIT 10;
 """
 
-# Поиск фильмов по жанру и году
-search_by_genre_year_query = """
+# Поиск фильмов по жанру
+search_by_genre_query = """
 SELECT f.title, c.name AS genre, f.release_year
 FROM film f
 LEFT JOIN film_category fc ON f.film_id = fc.film_id
 LEFT JOIN category c ON fc.category_id = c.category_id
-WHERE c.name = %s AND f.release_year = %s
-ORDER BY f.release_year, c.name;
+WHERE c.name = %s
+ORDER BY f.release_year
+LIMIT 10;
 """
 
-# Получение списка категорий
+# Поиск фильмов по жанру и годам
+search_by_genre_and_years_query = """
+SELECT f.title, c.name AS genre, f.release_year
+FROM film f
+LEFT JOIN film_category fc ON f.film_id = fc.film_id
+LEFT JOIN category c ON fc.category_id = c.category_id
+WHERE c.name = %s AND f.release_year IN ({})
+ORDER BY f.release_year;
+"""
+
+# Получение списка категорий (жанров)
 get_categories_query = """
 SELECT name FROM category;
 """
-
 
 # Создание таблицы для хранения поисковых запросов по ключевым словам
 create_search_keywords_table = """
