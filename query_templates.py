@@ -5,17 +5,33 @@ FROM film
 WHERE title LIKE %s OR description LIKE %s 
 LIMIT 10;
 """
+# Поиск фильмов по ключевому слову
+search_by_keyword_query = """
+SELECT title, description
+FROM film 
+WHERE title LIKE %s OR description LIKE %s 
+LIMIT 10;
+"""
 
-# Поиск фильмов по жанру
+# TOP фильмов по жанру
 search_by_genre_query = """
-SELECT f.title, c.name AS genre, f.release_year
+SELECT f.title, c.name AS genre, f.rental_rate, f.release_year
 FROM film f
 LEFT JOIN film_category fc ON f.film_id = fc.film_id
 LEFT JOIN category c ON fc.category_id = c.category_id
 WHERE c.name = %s
-ORDER BY f.release_year
+ORDER BY f.rental_rate DESC, f.release_year DESC
 LIMIT 10;
 """
+
+#TOP фильмов по году
+search_movies_by_year_query = """
+    SELECT f.title, f.release_year, f.rental_rate
+    FROM film f
+    WHERE f.release_year = %s
+    ORDER BY f.rental_rate DESC
+    LIMIT 10;
+    """
 
 # Поиск фильмов по жанру и годам
 search_by_genre_and_years_query = """
