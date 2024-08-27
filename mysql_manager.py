@@ -1,4 +1,5 @@
 import mysql.connector
+
 from local_settings import dbconfig
 from query_templates import *
 
@@ -21,7 +22,7 @@ class MixinMySQLQuery:
         try:
             self.cursor.execute(query, params)
             self.connection.commit()
-            #print(f"Saved query with params: {params}")
+            # print(f"Saved query with params: {params}")
         except Exception as e:
             print(f"{e.__class__.__name__}: {e}")
 
@@ -59,7 +60,7 @@ class MySQLConnection(MixinMySQLQuery):
                 print("Таблица 'search_keywords_sv' успешно создана.")
             except Exception as e:
                 print(f"Ошибка при создании таблицы: {e}")
-        #else:
+        # else:
         #    print("Таблица 'search_keywords_sv' уже существует.")
 
 

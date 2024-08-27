@@ -1,10 +1,12 @@
+from prettytable import PrettyTable
+
+from local_settings import dbconfig
 from mysql_manager import MySQLConnection
 from query_templates import (
     search_by_keyword_query, search_by_genre_query, search_by_genre_and_years_query, search_movies_by_year_query,
     get_popular_keywords_query, get_popular_genres_query, get_categories_query,
-    save_search_keyword_query, save_search_genre_year_query
+    save_search_keyword_query
 )
-from local_settings import dbconfig
 
 
 def get_categories(db):
@@ -16,9 +18,11 @@ def search_movies_by_genre(db, genre):
     result = db.simple_select(search_by_genre_query, (genre,))
     return result
 
+
 def search_movies_by_year(db, year):
     result = db.simple_select(search_movies_by_year_query, (year,))
     return result
+
 
 def search_movies_by_genre_and_years(db, genre, years):
     query = search_by_genre_and_years_query.format(','.join(['%s'] * len(years)))
@@ -52,12 +56,14 @@ def display_popular_genres(db):
     else:
         print("К сожалению, мы не нашли запросов по указанным жанрам и годам.")
 
+
 def is_valid_year(year):
     try:
         year = int(year)
         return 1980 <= year <= 2023
     except ValueError:
         return False
+
 
 def main():
     with MySQLConnection(dbconfig) as db:
@@ -79,10 +85,17 @@ def main():
                     keyword = input("Введите ключевое слово для поиска: ")
                     result = search_movies_by_keyword(db, keyword)
                     if result:
+                        # Создаем таблицу с заголовками "Название" и "Описание"
+                        table = PrettyTable()
+                        table.field_names = ["Название фильма", "Описание"]
+
                         for row in result:
                             title = row[0]
                             description = row[1]
-                            print(f"Название фильма: {title}, Описание: {description}")
+                            table.add_row([title, description])
+
+                        table.align = "l"
+                        print(table)
                         break
                     else:
                         print("К сожалению, фильмы не найдены.")
@@ -111,11 +124,20 @@ def main():
                 result = search_movies_by_genre(db, selected_category)
                 if result:
                     print(f"\nТОП 10 популярных фильмов по жанру '{selected_category}':")
+
+                    table = PrettyTable()
+                    table.field_names = ["Название фильма", "Год выхода"]
+
+                    table.align["Название фильма"] = "l"
+                    table.align["Год выхода"] = "l"
+
+                    # Добавляем строки в таблицу
                     for row in result:
-                        title = row[0]  # Название фильма
-                        genre = row[1]  # Жанр
-                        year = row[3]  # Год выпуска
-                        print(f"Название фильма: {title}, Жанр: {genre}, Год: {year}")
+                        title = row[0]
+                        year = row[3]
+                        table.add_row([title, year])
+
+                    print(table)
                 else:
                     print("К сожалению, фильмы не найдены.")
 
@@ -132,22 +154,58 @@ def main():
                 result = search_movies_by_year(db, year)
                 if result:
                     print(f"\nТОП 10 популярных фильмов за {year}:")
+                    table = PrettyTable()
+                    table.field_names = ["Название фильма", "Рейтинг популярности"]
+
+                    table.align["Название фильма"] = "l"
+                    table.align["Рейтинг популярности"] = "l"
+
                     for row in result:
-                        title = row[0]  # Название фильма
-                        rental_rate = row[2]  # Рейтинг/стоимость аренды
-                        print(f"Название фильма: {title}, Рейтинг популярности: {rental_rate}")
+                        title = row[0]
+                        rental_rate = row[2]
+                        table.add_row([title, rental_rate])
+                    print(table)
                 else:
                     print(f"К сожалению, фильмы за {year} не найдены.")
 
             elif choice == '4':
-                # Показ популярных запросов
-                display_popular_keywords(db)
-                display_popular_genres(db)
+                result_keywords = db.simple_select(get_popular_keywords_query)
+                if result_keywords:
+                    print("Популярные ключевые слова:")
+
+                    keyword_table = PrettyTable()
+                    keyword_table.field_names = ["№", "Ключевое слово", "Количество запросов"]
+                    keyword_table.align = "l"
+
+                    for idx, row in enumerate(result_keywords, start=1):
+                        keyword = row[0]
+                        count = row[1]
+                        keyword_table.add_row([idx, keyword, count])
+                    print(keyword_table)
+
+                else:
+                    print("К сожалению, запросов по ключевым словам не найдено.")
+                result_genres = db.simple_select(get_popular_genres_query)
+                if result_genres:
+                    print("Популярные жанры и годы по запросам:")
+
+                    genre_table = PrettyTable()
+                    genre_table.field_names = ["№", "Жанр", "Год", "Количество запросов"]
+                    genre_table.align = "l"
+
+                    for idx, row in enumerate(result_genres, start=1):
+                        genre = row[0]
+                        year = row[1]
+                        count = row[2]
+                        genre_table.add_row([idx, genre, year, count])
+                    print(genre_table)
+                else:
+                    print("К сожалению, запросов по жанрам не найдено.")
 
             elif choice == '5':
                 while True:
                     year_input = input(
-                        "Введите один или несколько лет с 1980 по 2023 гг. через запятую (например: 2000, 2005, 2010): ")
+                        "Введите один год или несколько с 1980 по 2023 гг. через запятую (например: 2000, 2005, 2010): ")
                     years = year_input.split(',')
                     if all(is_valid_year(year.strip()) for year in years):
                         selected_years = [int(year.strip()) for year in years]
@@ -174,11 +232,17 @@ def main():
                 result = search_movies_by_genre_and_years(db, selected_category, selected_years)
                 if result:
                     print(f"\nФильмы по жанру '{selected_category}' и выбранным годам:")
-                    for row in result:
+
+                    table = PrettyTable()
+                    table.field_names = ["№", "Название фильма", "Год выхода"]
+                    table.align["Название фильма"] = "l"
+                    table.align["Год выхода"] = "l"
+
+                    for idx, row in enumerate(result, start=1):
                         title = row[0]  # Название фильма
-                        genre = row[1]  # Жанр
                         year = row[2]  # Год выпуска
-                        print(f"Название: {title}, Жанр: {genre}, Год: {year}")
+                        table.add_row([idx, title, year])
+                    print(table)
                 else:
                     print("К сожалению, фильмы не найдены.")
 

@@ -80,7 +80,7 @@ LIMIT 10;
 
 # Запрос для получения популярных жанров и годов
 get_popular_genres_query = """
-SELECT CONCAT(genre, ', Year: ', year) AS genre_year, search_count
+SELECT genre, year, search_count
 FROM search_genre_year_sv
 ORDER BY search_count DESC
 LIMIT 10;
