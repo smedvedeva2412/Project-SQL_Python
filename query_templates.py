@@ -5,13 +5,6 @@ FROM film
 WHERE title LIKE %s OR description LIKE %s 
 LIMIT 10;
 """
-# Поиск фильмов по ключевому слову
-search_by_keyword_query = """
-SELECT title, description
-FROM film 
-WHERE title LIKE %s OR description LIKE %s 
-LIMIT 10;
-"""
 
 # TOP фильмов по жанру
 search_by_genre_query = """
@@ -86,7 +79,8 @@ SELECT genre, year, SUM(search_count) AS total_requests
 FROM search_genre_year_sv
 GROUP BY genre, year
 ORDER BY total_requests DESC
-LIMIT 10;
+LIMIT 10
+;
 """
 
 # Сохранение поискового запроса по ключевому слову

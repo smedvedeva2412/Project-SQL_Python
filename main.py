@@ -6,11 +6,11 @@ from mysql_manager import MySQLConnection
 from query_templates import (
     search_by_keyword_query, search_by_genre_query, search_by_genre_and_years_query, search_movies_by_year_query,
     get_popular_keywords_query, get_popular_genres_query, get_categories_query,
-    save_search_keyword_query
+    save_search_keyword_query, save_search_genre_year_query
 )
 from Funct import (
     get_categories, search_movies_by_genre, search_movies_by_year, search_movies_by_genre_and_years,
-    search_movies_by_keyword, display_popular_keywords, display_popular_genres, is_valid_year
+    search_movies_by_keyword, is_valid_year
 )
 
 
@@ -143,22 +143,22 @@ def main():
                 else:
                     print("К сожалению, запросов по жанрам не найдено.")
 
+
             elif choice == '5':
                 while True:
-                    year_input = input("Введите один год или несколько с 1980 по 2023 гг. через запятую (например: 2000, 2005, 2010): ")
+                    year_input = input(
+                        "Введите один год или несколько с 1980 по 2023 гг. через запятую (например: 2000, 2005, 2010): ")
                     years = year_input.split(',')
                     if all(is_valid_year(year.strip()) for year in years):
                         selected_years = [int(year.strip()) for year in years]
                         break
                     else:
                         print("Ошибка: пожалуйста, введите корректные годы в диапазоне от 1980 до 2023.")
-
                 while True:
                     categories = get_categories(db, get_categories_query)
                     print("\nВыберите жанр из списка:")
                     for idx, category in enumerate(categories, start=1):
                         print(f"{idx}. {category}")
-
                     try:
                         category_choice = int(input("Укажите выбранный жанр (номер): ")) - 1
                         if category_choice < 0 or category_choice >= len(categories):
@@ -168,15 +168,16 @@ def main():
                     except ValueError as e:
                         print(f"Ошибка: {e}. Пожалуйста, введите корректный номер жанра.")
 
-                result = search_movies_by_genre_and_years(db, selected_category, selected_years, search_by_genre_and_years_query)
+                result = search_movies_by_genre_and_years(db, selected_category, selected_years,
+                                                          search_by_genre_and_years_query)
+                for year in selected_years:
+                    db.save_search_query(save_search_genre_year_query, selected_category, year)
                 if result:
                     print(f"\nФильмы по жанру '{selected_category}' и выбранным годам:")
-
                     table = PrettyTable()
                     table.field_names = ["№", "Название фильма", "Год выхода"]
                     table.align["Название фильма"] = "l"
                     table.align["Год выхода"] = "l"
-
                     for idx, row in enumerate(result, start=1):
                         title = row[0]
                         year = row[2]
@@ -184,14 +185,11 @@ def main():
                     print(table)
                 else:
                     print("К сожалению, фильмы не найдены.")
-
             elif choice == '0':
                 print("Выход из программы.")
                 break
-
             else:
                 print("Выберете цифру, соответствующую вашему запросу, и попробуйте снова.")
-
 
 
 if __name__ == "__main__":
