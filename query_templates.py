@@ -26,8 +26,10 @@ LIMIT 10;
 
 #TOP фильмов по году
 search_movies_by_year_query = """
-    SELECT f.title, f.release_year, f.rental_rate
+       SELECT f.title, c.name AS genre, f.rental_rate
     FROM film f
+    LEFT JOIN film_category fc ON f.film_id = fc.film_id
+    LEFT JOIN category c ON fc.category_id = c.category_id
     WHERE f.release_year = %s
     ORDER BY f.rental_rate DESC
     LIMIT 10;
@@ -80,9 +82,10 @@ LIMIT 10;
 
 # Запрос для получения популярных жанров и годов
 get_popular_genres_query = """
-SELECT genre, year, search_count
+SELECT genre, year, SUM(search_count) AS total_requests
 FROM search_genre_year_sv
-ORDER BY search_count DESC
+GROUP BY genre, year
+ORDER BY total_requests DESC
 LIMIT 10;
 """
 
